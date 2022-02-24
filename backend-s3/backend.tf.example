@@ -1,0 +1,17 @@
+
+terraform {
+  
+  backend "s3" {
+
+    bucket = "terraform-store-state-${var.owner}"
+    key = "terraform.tfstate"
+    region = "ap-southeast-1"
+
+    dynamodb_table = "terraform-lock-state-${var.owner}"
+
+    encrypt = true
+
+    kms_key_id = "alias/terraform-bucket-key-state"
+  }
+}
+
