@@ -3,10 +3,6 @@ output "instance-centos-public-ip" {
   value = aws_instance.ec2-centos-terraform.public_ip
 }
 
-output "instance-centos-public-key" {
-  value = aws_key_pair.terraform-centos-key.public_key
-}
-
 output "rds-mysql-endpoint" {
   value = aws_db_instance.terraform-rds-mysql.endpoint
 }
@@ -33,10 +29,6 @@ output "dynamodb_table_arn" {
   value = aws_dynamodb_table.terraform_locks.arn
 }
 
-output "kms_key" {
-  value = aws_kms_key.terraform-bucket-key-store-state.key_usage
-}
-
 output backend_configuration {
 
   value = <<BACKEND
@@ -48,7 +40,7 @@ output backend_configuration {
 
               dynamodb_table = "${aws_dynamodb_table.terraform_locks.name}"
               encrypt = true
-              kms_key_id = "${aws_kms_key.terraform-bucket-key-store-state.id}"
+              kms_key_id = "${aws_kms_key.key-alias.id}"
             }
           }
           BACKEND

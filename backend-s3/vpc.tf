@@ -5,7 +5,7 @@ resource "aws_vpc" "terraform-vpc" {
   enable_dns_hostnames = true
 
   tags = {
-    Name = "terraform-vpc-eboi"
+    Name = "terraform-vpc-${var.owner}"
   }
 }
 
@@ -13,7 +13,7 @@ resource "aws_internet_gateway" "terraform-igw" {
   vpc_id = aws_vpc.terraform-vpc.id
   
   tags = {
-    Name = "terraform-igw-eboi"
+    Name = "terraform-igw-${var.owner}"
   }
 }
 
@@ -25,7 +25,7 @@ resource "aws_subnet" "public-subnet" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "terraform-public-subnet"
+    Name = "terraform-public-subnet-${var.owner}"
   }
 }
 
@@ -38,7 +38,7 @@ resource "aws_route_table" "public-rt" {
   }
 
   tags = {
-    Name = "terraform-rt-public-subnet"
+    Name = "terraform-rt-public-subnet-${var.owner}"
   }
 }
 
@@ -54,7 +54,7 @@ resource "aws_subnet" "private-subnet-1a" {
   availability_zone = var.terraform-az-1a
 
   tags = {
-    Name = "terraform-private-subnet-1a"
+    Name = "terraform-private-subnet-1a-${var.owner}"
   }
 }
 
@@ -64,7 +64,7 @@ resource "aws_subnet" "private-subnet-1b" {
   availability_zone = var.terraform-az-1b
 
   tags = {
-    Name = "terraform-private-subnet-1b"
+    Name = "terraform-private-subnet-1b-${var.owner}"
   }
 }
 
@@ -72,7 +72,7 @@ resource "aws_db_subnet_group" "terraform-subnet-group" {
   subnet_ids = [aws_subnet.private-subnet-1a.id, aws_subnet.private-subnet-1b.id]
 
   tags = {
-    Name = "terraform-subnet-group"
+    Name = "terraform-subnet-group-${var.owner}"
   }
 }
 
@@ -80,6 +80,6 @@ resource "aws_route_table" "private-rt" {
   vpc_id = aws_vpc.terraform-vpc.id
 
   tags = {
-    Name = "terraform-rt-private-subnet"
+    Name = "terraform-rt-private-subnet-${var.owner}"
   }
 }

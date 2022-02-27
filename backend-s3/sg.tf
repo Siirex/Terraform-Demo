@@ -28,7 +28,7 @@ resource "aws_security_group" "sg-centos-terraform" {
   }
 
   tags = {
-    Name = "sg-centos-terraform-eboi"
+    Name = "sg-centos-terraform-${var.owner}"
   }
 }
 
@@ -53,6 +53,6 @@ resource "aws_security_group" "sg-rds-mysql-terraform" {
   }
 
   tags = {
-    Name = "sg-rds-mysql-terraform-eboi"
+    Name = "sg-rds-mysql-terraform-${var.owner}"
   }
 }
