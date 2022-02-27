@@ -43,9 +43,9 @@ resource "aws_autoscaling_group" "asg" {
   
   launch_configuration = aws_launch_configuration.launch_instance_config.id
 
-  vpc_zone_identifier = [ aws_subnet.public-subnet-1a.id, aws_subnet.public-subnet-1b.id ] //Webserver Cluster inside Public Subnet 1a & 1b (đảm bảo tính sẵn sàng)
-  # availability_zones = [ "${var.terraform-az-1a}", "${var.terraform-az-1b}" ] //xung đột với "vpc_zone_identifier", vì bản thân thằng này chỉ định Public Subnet, trong Subnet đó đã chỉ định AZ luôn rồi (az-1a & az-1b)
-
+  vpc_zone_identifier = [ aws_subnet.public-subnet-1a.id, aws_subnet.public-subnet-1b.id ]
+  # availability_zones = [ "${var.terraform-az-1a}", "${var.terraform-az-1b}" ]
+  
   min_size = var.asg-min-instance
   max_size = var.asg-max-instance
 

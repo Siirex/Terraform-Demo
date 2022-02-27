@@ -2,8 +2,8 @@
 resource "aws_elb" "elb" {
   name = "terraform-asg-${var.owner}"
 
-  # availability_zones = [ "${var.terraform-az-1a}", "${var.terraform-az-1b}" ] //xung đột với "subnets"
-  # subnets = [ aws_subnet.public-subnet-1a.id, aws_subnet.public-subnet-1b.id ] //error: ELB cannot be attached to multiple subnets in the same AZ
+  # availability_zones = [ "${var.terraform-az-1a}", "${var.terraform-az-1b}" ]
+  # subnets = [ aws_subnet.public-subnet-1a.id, aws_subnet.public-subnet-1b.id ]
   subnets = [ aws_subnet.public-subnet-1a.id ]
 
   security_groups = [ aws_security_group.sg_elb.id ]

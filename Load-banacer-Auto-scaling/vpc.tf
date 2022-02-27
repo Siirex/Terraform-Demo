@@ -1,15 +1,4 @@
 
-# -------------------------------------------------------------------------------------
-# Vì ASG, ELB áp dụng vào Webserver Cluster Instance
-# Bình thường, Single Instance chỉ thuộc 1 Public Subnet, Subnet đó nằm trong 1 AZ cụ thể
-# Như vậy, nếu triển khai Cluster Instance để đảm bảo tính khả dụng và sẵn sàng ...
-# ... thì phải cũng cấp infra có ít nhất 2 Public Subnet, mỗi subnet thuộc 1 AZ của Region
-# -------------------------------------------------------------------------------------
-# Vậy, trường hợp này ta cần 2 Public Subnet, 2 AZ cho Webserver Cluster
-# ... 2 Private Subnet, 2 AZ (cùng 2 az trên) cho Databaseserver
-# -------------------------------------------------------------------------------------
-
-
 resource "aws_vpc" "terraform-vpc" {
   cidr_block = var.terraform-vpc-test
   enable_dns_support = true
