@@ -54,7 +54,7 @@ resource "aws_route_table_association" "public-1a" {
 resource "aws_subnet" "public-subnet-1b" {
   vpc_id     = aws_vpc.terraform-vpc.id
   cidr_block = var.terraform-public-subnet-1b
-  availability_zone = var.terraform-az-1a
+  availability_zone = var.terraform-az-1b
 
   map_public_ip_on_launch = true
 
@@ -80,6 +80,8 @@ resource "aws_route_table_association" "public-1b" {
   subnet_id = aws_subnet.public-subnet-1b.id
   route_table_id = aws_route_table.public-rt-1b.id
 }
+
+/*
 
 # ------------------------------------------------------- Private Subnet inside AZ (1a)
 
@@ -123,3 +125,5 @@ resource "aws_route_table" "private-rt" {
     Name = "terraform-rt-private-subnet"
   }
 }
+
+*/

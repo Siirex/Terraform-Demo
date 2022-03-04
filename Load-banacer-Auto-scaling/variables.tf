@@ -17,26 +17,26 @@ variable "terraform-private-subnet-1b" {}
 
 variable "owner" {
   description = "owner name of project"
-  type        = string
+  type = string
   default = "siirex"
 }
 
 variable "asg-min-instance" {
-  type        = number
+  type = number
   default = 2
 }
 
 variable "asg-max-instance" {
-  type        = number
+  type = number
   default = 4
 }
 
 variable "server_port" {
-  type        = number
-  default     = 8080
+  type = number
+  default = 8080
 }
 
 variable "elb_port" {
-  type        = number
-  default     = 80
+  type = number
+  default = 80
 }

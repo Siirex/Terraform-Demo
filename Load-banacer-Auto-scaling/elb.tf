@@ -1,15 +1,20 @@
 
+# Use Class Load Balancer (CLB)
+
 resource "aws_elb" "elb" {
   name = "terraform-asg-${var.owner}"
 
   # availability_zones = [ "${var.terraform-az-1a}", "${var.terraform-az-1b}" ]
-  # subnets = [ aws_subnet.public-subnet-1a.id, aws_subnet.public-subnet-1b.id ]
-  subnets = [ aws_subnet.public-subnet-1a.id ]
+  subnets = [ aws_subnet.public-subnet-1a.id, aws_subnet.public-subnet-1b.id ]
 
   security_groups = [ aws_security_group.sg_elb.id ]
 
+  cross_zone_load_balancing = true
+  connection_draining = true
+  connection_draining_timeout = 300
+
   health_check {
-    target = "HTTP:${var.server_port}/"
+    target = "TCP:${var.server_port}"
     interval = 30
     timeout = 3
     healthy_threshold = 2
@@ -35,7 +40,7 @@ resource "aws_security_group" "sg_elb" {
     from_port = 0
     to_port = 0
     protocol = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [ "${var.terraform-vpc-test}" ] //only forward to my VPC
   }
 
   ingress {
@@ -45,5 +50,3 @@ resource "aws_security_group" "sg_elb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-
-

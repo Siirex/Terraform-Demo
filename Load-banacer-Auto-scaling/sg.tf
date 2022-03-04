@@ -3,6 +3,7 @@ resource "aws_security_group" "sg-centos-terraform" {
 
   vpc_id = aws_vpc.terraform-vpc.id
 
+  /*
   ingress {
     description = "allow ssh to Cluster"
     from_port = 22
@@ -10,14 +11,7 @@ resource "aws_security_group" "sg-centos-terraform" {
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
-  ingress {
-    description = "allow request http form ELB to Cluster"
-    from_port = var.server_port
-    to_port = var.server_port
-    protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  */
 
   egress {
     description = "allow all outbound connections"
@@ -32,6 +26,18 @@ resource "aws_security_group" "sg-centos-terraform" {
   }
 }
 
+resource "aws_security_group_rule" "sg-ingress-centos-terraform" {
+  type = "ingress"
+  description = "allow request http form ELB to Cluster"
+  security_group_id = aws_security_group.sg-centos-terraform.id
+
+  from_port = var.server_port
+  to_port = var.server_port
+  protocol = "tcp"
+  source_security_group_id = aws_security_group.sg_elb.id
+}
+
+/*
 resource "aws_security_group" "sg-rds-mysql-terraform" {
 
   vpc_id = aws_vpc.terraform-vpc.id
@@ -56,3 +62,4 @@ resource "aws_security_group" "sg-rds-mysql-terraform" {
     Name = "sg-rds-mysql-terraform-${var.owner}"
   }
 }
+*/
