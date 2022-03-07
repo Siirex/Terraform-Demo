@@ -81,7 +81,6 @@ resource "aws_route_table_association" "public-1b" {
   route_table_id = aws_route_table.public-rt-1b.id
 }
 
-/*
 
 # ------------------------------------------------------- Private Subnet inside AZ (1a)
 
@@ -125,5 +124,3 @@ resource "aws_route_table" "private-rt" {
     Name = "terraform-rt-private-subnet"
   }
 }
-
-*/

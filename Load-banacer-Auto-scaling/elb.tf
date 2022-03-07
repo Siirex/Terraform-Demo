@@ -10,11 +10,13 @@ resource "aws_elb" "elb" {
   security_groups = [ aws_security_group.sg_elb.id ]
 
   cross_zone_load_balancing = true
+  idle_timeout = 60
   connection_draining = true
   connection_draining_timeout = 300
 
   health_check {
     target = "TCP:${var.server_port}"
+    # target = "HTTP:${var.server_port}/path"
     interval = 30
     timeout = 3
     healthy_threshold = 2
@@ -22,11 +24,9 @@ resource "aws_elb" "elb" {
   }
 
   listener {
-    # ELB use port 80 to listen for HTTP requests
     lb_port = var.elb_port
     lb_protocol = "http"
 
-    # Instances use port 8080 to listen for HTTP requests
     instance_port = var.server_port
     instance_protocol = "http"
   }
@@ -37,15 +37,22 @@ resource "aws_security_group" "sg_elb" {
   vpc_id = aws_vpc.terraform-vpc.id
 
   egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
-    cidr_blocks = [ "${var.terraform-vpc-test}" ] //only forward to my VPC
+    from_port = var.elb_port
+    to_port = var.elb_port
+    protocol = "tcp"
+    cidr_blocks = [ "0.0.0.0/0" ]
   }
 
   ingress {
     from_port = var.elb_port
     to_port = var.elb_port
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port = 22
+    to_port = 22
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }

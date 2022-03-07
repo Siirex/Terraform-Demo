@@ -3,41 +3,59 @@ resource "aws_security_group" "sg-centos-terraform" {
 
   vpc_id = aws_vpc.terraform-vpc.id
 
-  /*
-  ingress {
-    description = "allow ssh to Cluster"
-    from_port = 22
-    to_port = 22
-    protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  */
-
-  egress {
-    description = "allow all outbound connections"
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   tags = {
     Name = "sg-centos-terraform-${var.owner}"
   }
 }
 
-resource "aws_security_group_rule" "sg-ingress-centos-terraform" {
+# Inbound rule: Allow HTTP request for Cluster
+resource "aws_security_group_rule" "sg-http-ingress-centos-terraform" {
   type = "ingress"
-  description = "allow request http form ELB to Cluster"
+  description = "allow HTTP traffic form LB to Cluster"
   security_group_id = aws_security_group.sg-centos-terraform.id
 
-  from_port = var.server_port
-  to_port = var.server_port
+  from_port = 80
+  to_port = 80
   protocol = "tcp"
   source_security_group_id = aws_security_group.sg_elb.id
 }
 
-/*
+# Inbound rule: Allow SSH connection for Cluster
+resource "aws_security_group_rule" "sg-ssh-ingress-centos-terraform" {
+  type = "ingress"
+  description = "allow SSH traffic form LB to Cluster"
+  security_group_id = aws_security_group.sg-centos-terraform.id
+
+  from_port = 22
+  to_port = 22
+  protocol = "tcp"
+  source_security_group_id = aws_security_group.sg_elb.id
+}
+
+# Outbound rule: Allow Cluster communicate with Internet
+resource "aws_security_group_rule" "sg-http-egress-centos-terraform" {
+  type = "egress"
+  security_group_id = aws_security_group.sg-centos-terraform.id
+
+  from_port = 80
+  to_port = 80
+  protocol = "tcp"
+  source_security_group_id = aws_security_group.sg_elb.id //source output is LB
+}
+
+# Outbound rule: Allow Cluster send MySQL/Aurora traffics on 2 Private Subnet
+resource "aws_security_group_rule" "sg-http-egress-centos-terraform" {
+  type = "egress"
+  security_group_id = aws_security_group.sg-centos-terraform.id
+
+  from_port = 3306
+  to_port = 3306
+  protocol = "tcp"
+  cidr_blocks = [ "${aws_subnet.private-subnet-1a}", "${aws_subnet.private-subnet-1b}" ]
+}
+
+# ------------------------------------------------------------------------------------------------
+
 resource "aws_security_group" "sg-rds-mysql-terraform" {
 
   vpc_id = aws_vpc.terraform-vpc.id
@@ -47,7 +65,7 @@ resource "aws_security_group" "sg-rds-mysql-terraform" {
     from_port = 3306
     to_port = 3306
     protocol = "tcp"
-    cidr_blocks = [ "${var.terraform-public-subnet-1a}", "${var.terraform-public-subnet-1b}" ] //CIDR public subnet
+    cidr_blocks = [ "${var.terraform-public-subnet-1a}", "${var.terraform-public-subnet-1b}" ]
   }
 
   egress {
@@ -55,11 +73,10 @@ resource "aws_security_group" "sg-rds-mysql-terraform" {
     from_port = 0
     to_port = 0
     protocol = "-1"
-    cidr_blocks = ["${var.terraform-vpc-test}"] //CIDR VPC
+    cidr_blocks = ["${var.terraform-vpc-test}"]
   }
 
   tags = {
     Name = "sg-rds-mysql-terraform-${var.owner}"
   }
 }
-*/
