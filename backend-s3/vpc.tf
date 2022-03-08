@@ -78,8 +78,15 @@ resource "aws_db_subnet_group" "terraform-subnet-group" {
 
 resource "aws_route_table" "private-rt" {
   vpc_id = aws_vpc.terraform-vpc.id
+  
+  # no route? --> use 'default route' with route: destination "cidr_vpc", target "local"
 
   tags = {
     Name = "terraform-rt-private-subnet-${var.owner}"
   }
+}
+
+resource "aws_route_table_association" "private-rt" {
+  subnet_id = aws_db_subnet_group.terraform-subnet-group.id //association 'Private Subnet Group' to ...
+  route_table_id = aws_route_table.private-rt.id
 }
