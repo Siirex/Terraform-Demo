@@ -1,0 +1,31 @@
+
+[{
+  "name": "terraform",
+  "image": "${account_id}.dkr.ecr.${region}.amazonaws.com/${repo}:${tags}",
+  
+  "entryPoint": [],
+  "command": ["bundle", "exec", "rackup", "-p", "8080", "-E", "stage-test"],
+  
+  "environment": [
+    { "name": "MESSAGE", "value": "${message}" }
+  ],
+
+  "logConfiguration": {
+    "logDriver": "awslogs",
+    "options": {
+      "awslogs-group": "/ecs/task-test/container",
+      "awslogs-region": "${region}",
+      "awslogs-stream-prefix": "terraform-logs-for-task-test"
+    }
+  },
+
+  "cpu": 1024,
+  "networkMode": "host",
+
+  "portMappings": [
+    { "containerPort": 8080, 
+      "hostPort": 8080, 
+      "protocol": "tcp" 
+    }
+  ]
+}]
