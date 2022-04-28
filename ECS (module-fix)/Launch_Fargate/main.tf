@@ -113,7 +113,7 @@ module "ecs" {
 
   ecs_service_name = "terraform-ecs-service-for-task-test__fargate"
   launch_type = "FARGATE"
-  service_count = 2 //chỉ định số lượng Instance để đặt các Task?
+  service_count = 2 //chỉ định số lượng Task chạy backup (đáp ứng khả năng sẵn sàng của các Container chạy trong đó)
 
   # Nếu áp dụng FARGATE, không cần add Role cho ECS Service nữa, vì đã có SG!!!
   # service_role = module.role.ecs_ecs_role_arn

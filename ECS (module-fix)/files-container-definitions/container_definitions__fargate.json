@@ -15,9 +15,9 @@
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
-        "awslogs-group": "/ecs/task-test/container__fargate",
+        "awslogs-group": "${logs_group}",
         "awslogs-region": "${region}",
-        "awslogs-stream-prefix": "terraform-logs-for-task-test__fargate"
+        "awslogs-stream-prefix": "${logs_stream}"
       }
     },
   
