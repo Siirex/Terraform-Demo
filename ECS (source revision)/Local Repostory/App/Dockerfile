@@ -1,0 +1,17 @@
+
+FROM ruby:2.7.4-alpine
+
+WORKDIR /var/www/app
+
+COPY Gemfile* ./
+
+RUN gem install bundler
+RUN bundle install
+
+COPY . /var/www/app
+
+EXPOSE 8080
+
+# Chạy Rack dưới với ENV 'stage-test'
+CMD ["bundle", "exec", "rackup", "-E", "stage-test"]
+

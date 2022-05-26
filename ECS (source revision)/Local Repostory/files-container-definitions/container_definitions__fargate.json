@@ -1,0 +1,35 @@
+
+[{
+    "name": "terraform",
+    "image": "${account_id}.dkr.ecr.${region}.amazonaws.com/${repo}:${tags}",
+    
+    "entryPoint": [],
+    "command": ["bundle", "exec", "rackup", "-p", "8080", "-E", "stage-test"],
+    
+    "environment": [
+      { "name": "MESSAGE", "value": "${message}" }
+    ],
+  
+    "essential": true,
+  
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "${logs_group}",
+        "awslogs-region": "${region}",
+        "awslogs-stream-prefix": "${logs_stream}"
+      }
+    },
+  
+    "cpu": 256,
+    "memory": 512,
+    "networkMode": "awsvpc",
+  
+    "portMappings": [
+      { "containerPort": 8080, 
+        "hostPort": 8080, 
+        "protocol": "tcp" 
+      }
+    ]
+  }]
+  
