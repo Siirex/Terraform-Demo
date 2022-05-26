@@ -1,0 +1,45 @@
+
+{
+  "containerDefinitions": [
+    {
+      "name": "terraform",
+      "image": "<IMAGE1_NAME>",
+      
+      "entryPoint": [],
+      "command": ["bundle", "exec", "rackup", "-E", "stage-test"],
+      
+      "environment": [
+        { "name": "MESSAGE", "value": "HelloCI/CD" }
+      ],
+    
+      "essential": true,
+    
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/task-test__fargate/container-new-cicd",
+          "awslogs-region": "ap-southeast-1",
+          "awslogs-stream-prefix": "terraform-logs-for-new-task-test__fargate-"
+        }
+      },
+    
+      "cpu": 256,
+      "memory": 512,
+      "networkMode": "awsvpc",
+    
+      "portMappings": [
+        { "containerPort": 8080, 
+          "hostPort": 8080, 
+          "protocol": "tcp" 
+        }
+      ]
+    }
+  ],
+  "cpu": "256",
+  "executionRoleArn": "arn:aws:iam::123456789:role/ecsTaskExecutionRole",
+  "family": "fargate-task-definition",
+  "memory": "512",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [ "FARGATE" ]
+}
+

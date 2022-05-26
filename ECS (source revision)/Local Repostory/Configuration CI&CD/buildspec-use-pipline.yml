@@ -1,0 +1,87 @@
+
+version: 0.2
+
+# run-as: <user> #Chỉ định người dùng Linux chạy các lệnh trong tệp buildspec này
+
+    # shell: bash | bin/bash | powershell.exe | cmd.exe
+    # variables: 
+        # key: "value" (...)
+    # parameter-store: 
+        # key: "value" (...)
+    # exported-variables: 
+        # - variables (...)
+    # secrets-manager: 
+        # key: secret-id:json-key:version-stage:version-id
+    # git-credential-helper: no | yes
+
+# Phân các lệnh chạy cách ly trong mỗi phases riêng biệt:
+phases:
+  
+  # Thường được dùng để cài đặt các packages trong môi trường build
+  install:
+    runtime-versions:
+        dotnet: 3.1  
+    commands:
+      - echo Installing something...
+      - python3 -m pip install pip --upgrade || exit 1
+
+      - apt-get update
+      - apt install jq # JSON processor
+
+      # Kiểm tra xem đã có các packages cần thiết trong máy ảo đang chạy bản build hay không?
+      - ps aux | grep docker
+      - env | grep CODEBUILD
+
+      # Set folder để logging ECR và build outputs
+      # - mkdir -p ./store_output/
+
+  # commands ECR login và khai báo biến sử dụng (các lệnh chạy trước khi build)
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws --version
+
+      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email) #chú ý, ở đây cần thêm quyền thao tác ECR cho CodeBuild
+          # $AWS_DEFAULT_REGION: The AWS Region where the build is running
+      
+      - REPOSITORY_URI=${acc_id}.dkr.ecr.${region}.amazonaws.com/${repo_ecr_name}
+
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7) #export ID Commit of APP-source on CodeCommit Repo
+      
+      - IMAGE_TAG=$${COMMIT_HASH:=latest} #Tag sẽ lấy ID Commit của source trên ... để đặt cho Docker Image
+
+  # docker build và docker tag commands (các lệnh chạy trong khi build)
+  build: 
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - echo Building for repository $REPOSITORY_URI
+      # - cd ${folder} # folder chứa source dự án & Dockerfile
+      - docker build -t $REPOSITORY_URI:latest . #build docker image (dockerfile) with source located at CodeCommit Repo
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG #add tag for this image
+
+  # docker push commands (các lệnh chạy sau khi build xong)
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker images...
+      - docker push $REPOSITORY_URI:latest #push this image:latest to CodeCommit Repo
+      - docker push $REPOSITORY_URI:$IMAGE_TAG #push this image:? to CodeCommit Repo
+
+      # Tạo file JSON định nghĩa Image, chứa Name & URI của Docker Images:
+      - printf '[{"name":"${repo_ecr_name}","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+
+      # Ghi toàn bộ việc xử lý của phase vào file log ở /store_output
+      # - cp ./log/test.log ./store_output/ 
+
+# Chỉ định Output Artifact - đầu ra cho quá trình build
+artifacts:
+  files:
+    - imagedefinitions.json
+    - taskdef.json
+    - appspec.yml
+    # - '**/*'
+  # base-directory: 'store_output' # trỏ đến folder vừa tạo
+  discard-paths: yes
+
+
